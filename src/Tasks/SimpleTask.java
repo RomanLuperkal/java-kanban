@@ -6,10 +6,9 @@ public class SimpleTask extends Task{
         this.description = description;
     }
 
-    public SimpleTask(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
+    public SimpleTask changeStatus(Status status) {
         this.status = status;
+        return this;
     }
 
     @Override
