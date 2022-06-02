@@ -7,10 +7,9 @@ public class Subtask extends Task{
         this.description = description;
     }
 
-    public Subtask(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
+    public Subtask changeStatus(Status status) {
         this.status = status;
+        return this;
     }
 
     @Override
