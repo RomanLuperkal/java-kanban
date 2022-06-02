@@ -1,14 +1,15 @@
 package Tasks;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EpicTask extends Task{
 
-    Map<Integer, Subtask> listSubtasks;
+    Map<Integer, Subtask> subtasks;
 
     public EpicTask(String name, String description) {
-        listSubtasks = new HashMap<>();
+        subtasks = new HashMap<>();
         this.name = name;
         this.description = description;
     }
@@ -16,47 +17,47 @@ public class EpicTask extends Task{
     public void checkSubtasksStatus () {
         int count = 0;
 
-        for (Subtask subtask : listSubtasks.values()) {
+        for (Subtask subtask : subtasks.values()) {
             if (subtask.status == Status.IN_PROGRESS) {
                 this.status = Status.IN_PROGRESS;
             } else if (subtask.status == Status.DONE) {
                 count++;
             }
-            if (count == listSubtasks.size()) {
+            if (count == subtasks.size()) {
                 this.status = Status.DONE;
             }
         }
     }
 
-    public ArrayList<Subtask> getSubtasks() {
-        return new ArrayList<>(listSubtasks.values());
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
     public void deleteSubtasks() {
-        listSubtasks.clear();
+        subtasks.clear();
     }
 
     public Subtask getSubtask(int id) throws NullPointerException{
-        if (listSubtasks.get(id) == null) {
+        if (subtasks.get(id) == null) {
             throw new NullPointerException("Такой подзадачи нет");
         } else {
-            return listSubtasks.get(id);
+            return subtasks.get(id);
         }
     }
 
     public Map<Integer, Subtask> getMapSubtasks() {
-        return listSubtasks;
+        return subtasks;
     }
 
     public void createSubtask(int id, Subtask subtask) {
         subtask.setId(id);
-        listSubtasks.put(id, subtask);
+        subtasks.put(id, subtask);
     }
 
     @Override
     public String toString() {
         return "EpicTask{" +
-                "listSubtasks=" + listSubtasks +
+                "listSubtasks=" + subtasks +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
