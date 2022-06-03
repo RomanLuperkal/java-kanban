@@ -1,17 +1,16 @@
-package Tasks;
+package tasks;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EpicTask extends Task{
+public class EpicTask extends Task {
 
     Map<Integer, Subtask> subtasks;
 
     public EpicTask(String name, String description) {
+        super(name, description);
         subtasks = new HashMap<>();
-        this.name = name;
-        this.description = description;
     }
 
     public void checkSubtasksStatus () {
