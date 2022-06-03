@@ -1,15 +1,9 @@
-package Tasks;
+package tasks;
 
-public class Subtask extends Task{
+public class Subtask extends Task {
 
     public Subtask(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public Subtask changeStatus(Status status) {
-        this.status = status;
-        return this;
+        super(name, description);
     }
 
     @Override
