@@ -9,6 +9,7 @@ public class EpicTask extends Task {
     Map<Integer, Subtask> subtasks;
 
     public EpicTask(String name, String description) {
+
         super(name, description);
         subtasks = new HashMap<>();
     }
