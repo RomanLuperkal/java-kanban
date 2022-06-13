@@ -5,17 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Manager {
+public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> tasks;
     private final Map<Integer, EpicTask> epics;
+    private final HistoryManager history;
     private int tasksId;
 
-    public Manager() {
+    public InMemoryTaskManager() {
         epics = new HashMap<>();
         tasks = new HashMap<>();
+        history = Managers.getDefaultHistory();
         this.tasksId = 0;
     }
 
+    @Override
     public List<Task> getTasks() throws NullPointerException {
         if (tasks.isEmpty()) {
             throw new NullPointerException("Список простых задач пуст");
@@ -24,7 +27,8 @@ public class Manager {
         }
     }
 
-    public List<EpicTask> getEpicTasks() throws  NullPointerException {
+    @Override
+    public List<EpicTask> getEpicTasks() throws NullPointerException {
         if (epics.isEmpty()) {
             throw new NullPointerException("Список эпических задач пуст");
         } else {
@@ -32,6 +36,7 @@ public class Manager {
         }
     }
 
+    @Override
     public List<Subtask> getSubtasks() throws NullPointerException {
         ArrayList<Subtask> listSubtasks = new ArrayList<>();
         for (EpicTask epicTask : epics.values()) {
@@ -44,14 +49,17 @@ public class Manager {
         }
     }
 
+    @Override
     public void deleteTasks() {
         tasks.clear();
     }
 
+    @Override
     public void deleteEpicTasks() {
         epics.clear();
     }
 
+    @Override
     public void deleteSubtasks() {
         if (epics.isEmpty()) {
             System.out.println("Подзадач нет");
@@ -62,44 +70,53 @@ public class Manager {
         }
     }
 
+    @Override
     public Task getTask(int id) throws NullPointerException {
         if (tasks.get(id) == null) {
             throw new NullPointerException("Такой задачи нет");
         } else {
+            history.add(tasks.get(id));
             return tasks.get(id);
         }
 
     }
 
-    public EpicTask getEpicTask(int id) throws  NullPointerException {
+    @Override
+    public EpicTask getEpicTask(int id) throws NullPointerException {
         if (epics.get(id) == null) {
             throw new NullPointerException("Такой задачи нет");
         } else {
+            history.add(epics.get(id));
             return epics.get(id);
         }
     }
 
+    @Override
     public Subtask getSubtask(int id) throws NullPointerException {
         Map<Integer, Subtask> subtasks;
         for (EpicTask epicTask : epics.values()) {
             subtasks = epicTask.getMapSubtasks();
             if (subtasks.containsKey(id)) {
+                history.add(subtasks.get(id));
                 return subtasks.get(id);
             }
         }
         throw new NullPointerException("Такой подзадачи нет");
     }
 
+    @Override
     public void createTask(Task task) {
         task.setId(getTaskId());
         tasks.put(task.getId(), task);
     }
 
+    @Override
     public void createEpicTask(EpicTask epicTask) {
         epicTask.setId(getTaskId());
         epics.put(epicTask.getId(), epicTask);
     }
 
+    @Override
     public void createSubtask(int epicTaskId, Subtask subtask) throws NullPointerException {
         if (epics.get(epicTaskId) == null) {
             throw new NullPointerException("Такой эпической задачи нет");
@@ -109,13 +126,15 @@ public class Manager {
         epicTask.createSubtask(subtask.getId(), subtask);
     }
 
-    public void updateTask(Task task) throws  NullPointerException {
+    @Override
+    public void updateTask(Task task) throws NullPointerException {
         if (!tasks.containsKey(task.getId())) {
             throw new NullPointerException("Ошибка обновления задачи! Такой задачи нет.");
         }
         tasks.put(task.getId(), task);
     }
 
+    @Override
     public void updateSubtask(Subtask subtask) throws NullPointerException {
         Map<Integer, Subtask> subtasks;
         for (EpicTask epicTask : epics.values()) {
@@ -129,6 +148,7 @@ public class Manager {
         throw new NullPointerException("Ошибка обновления подзачади! В эпических задачах такой подзадачи нет.");
     }
 
+    @Override
     public void updateEpicTask(EpicTask epicTask) throws NullPointerException {
         if (!epics.containsKey(epicTask.getId())) {
             throw new NullPointerException("Ошибка обновления эпической задачи! Такой эпической задачи нет.");
@@ -138,6 +158,7 @@ public class Manager {
         }
     }
 
+    @Override
     public void deleteTask(int id) throws NullPointerException {
         if (!tasks.containsKey(id)) {
             throw new NullPointerException("Ошибка удаления задачи! Такой задачи нет");
@@ -145,6 +166,7 @@ public class Manager {
         tasks.remove(id);
     }
 
+    @Override
     public void deleteEpicTask(int id) throws NullPointerException {
         if (!epics.containsKey(id)) {
             throw new NullPointerException("Ошибка удаления эпической задачи! Такой эпической задачи нет");
@@ -152,6 +174,7 @@ public class Manager {
         epics.remove(id);
     }
 
+    @Override
     public void deleteSubtask(int id) throws NullPointerException {
         Map<Integer, Subtask> subtasks;
         for (EpicTask epicTask : epics.values()) {
@@ -165,6 +188,7 @@ public class Manager {
         throw new NullPointerException("Ошибка удаления подзадачи! Эпической задачи с такой подзадачей нет.");
     }
 
+    @Override
     public List<Subtask> getListSubtasksByEpicTaskId(int id) {
         if (!epics.containsKey(id)) {
             throw new NullPointerException("Ошибка получения списка подзадач! Эпической задачи с таким id нет.");
@@ -173,7 +197,14 @@ public class Manager {
         return epicTask.getSubtasks();
     }
 
+    @Override
+    public List<Task> getHistory() {
+        return history.getHistory();
+    }
+
     private int getTaskId() {
         return tasksId++;
     }
+
+
 }
