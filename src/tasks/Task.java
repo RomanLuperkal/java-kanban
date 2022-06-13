@@ -9,6 +9,7 @@ public class Task {
     protected int id;
 
     public Task(String name, String description) {
+
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
