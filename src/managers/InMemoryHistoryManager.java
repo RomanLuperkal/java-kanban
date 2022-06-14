@@ -1,17 +1,20 @@
+package managers;
+
 import tasks.Task;
-import java.util.ArrayList;
+
+import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> history;
 
     public InMemoryHistoryManager() {
-        history = new ArrayList<>();
+        history = new LinkedList<>();
     }
 
-    public List<Task> getHistory() throws NullPointerException{
+    public List<Task> getHistory() throws IllegalStateException {
         if (history.isEmpty()) {
-            throw new NullPointerException("История просмотров пуста");
+            throw new IllegalStateException("История просмотров пуста");
         } else {
             return history;
         }
@@ -25,7 +28,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (history.size() < 10) {
             history.add(task);
         } else {
-            history.remove(0);
+            ((LinkedList<Task>) history).removeFirst();
             history.add(task);
         }
     }
