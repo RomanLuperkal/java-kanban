@@ -1,6 +1,8 @@
+import managers.Managers;
+import managers.TaskManager;
 import tasks.Task;
 
-import java.lang.NullPointerException;
+import java.lang.IllegalStateException;
 
 public class Main implements TestObjects {
 
@@ -32,7 +34,7 @@ public class Main implements TestObjects {
             for (Task task : inMemoryTaskManager.getHistory()) {
                 System.out.println(i++ + ": " + task);
             }
-        } catch (NullPointerException e) {
+        } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
