@@ -1,10 +1,13 @@
+package managers;
+
 import tasks.*;
+
 import java.util.List;
 
 public interface TaskManager {
     List<Task> getTasks();
 
-    List<EpicTask> getEpicTasks();
+    List<Epic> getEpicTasks();
 
     List<Subtask> getSubtasks();
 
@@ -16,13 +19,13 @@ public interface TaskManager {
 
     Task getTask(int id);
 
-    EpicTask getEpicTask(int id);
+    Epic getEpicTask(int id);
 
     Subtask getSubtask(int id);
 
     void createTask(Task task);
 
-    void createEpicTask(EpicTask epicTask);
+    void createEpicTask(Epic epic);
 
     void createSubtask(int epicTaskId, Subtask subtask);
 
@@ -30,7 +33,7 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
-    void updateEpicTask(EpicTask epicTask);
+    void updateEpicTask(Epic epic);
 
     void deleteTask(int id);
 
