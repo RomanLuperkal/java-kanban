@@ -54,11 +54,22 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTasks() {
+        for (int key : tasks.keySet()) {
+            history.remove(key);
+        }
         tasks.clear();
     }
 
     @Override
     public void deleteEpicTasks() {
+        Map<Integer, Subtask> subtasks;
+        for (Epic epic : epics.values()) {
+            subtasks = epic.getMapSubtasks();
+            for (int key : subtasks.keySet()) {
+                history.remove(key);
+            }
+            history.remove(epic.getId());
+        }
         epics.clear();
     }
 
@@ -68,7 +79,12 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Подзадач нет");
             return;
         }
+        Map<Integer, Subtask> subtasks;
         for (Epic epic : epics.values()) {
+            subtasks = epic.getMapSubtasks();
+            for (int key : subtasks.keySet()) {
+                history.remove(key);
+            }
             epic.deleteSubtasks();
         }
     }
@@ -166,6 +182,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(id)) {
             throw new IllegalStateException("Ошибка удаления задачи! Такой задачи нет");
         }
+        history.remove(id);
         tasks.remove(id);
     }
 
@@ -174,6 +191,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(id)) {
             throw new IllegalStateException("Ошибка удаления эпической задачи! Такой эпической задачи нет");
         }
+        List<Subtask> subtasks = getListSubtasksByEpicTaskId(id);
+        for (Subtask sub : subtasks) {
+            history.remove(sub.getId());
+        }
+        history.remove(id);
         epics.remove(id);
     }
 
@@ -183,6 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             subtasks = epic.getMapSubtasks();
             if (subtasks.containsKey(id)) {
+                history.remove(id);
                 subtasks.remove(id);
                 epic.checkSubtasksStatus();
                 return;
