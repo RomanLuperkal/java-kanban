@@ -22,6 +22,7 @@ public class Epic extends Task {
             if (subtask.status == Status.IN_PROGRESS) {
                 this.status = Status.IN_PROGRESS;
             } else if (subtask.status == Status.DONE) {
+                this.status = Status.IN_PROGRESS;
                 count++;
             }
             if (count == subtasks.size()) {
