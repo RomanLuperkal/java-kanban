@@ -1,6 +1,5 @@
 package managers;
 
-
 import tasks.Task;
 
 import java.util.*;
@@ -8,11 +7,7 @@ import java.util.*;
 public class InMemoryHistoryManager implements HistoryManager {
     private Node head;
     private Node tail;
-    final private Map<Integer, Node> map;
-
-    public InMemoryHistoryManager() {
-        map = new HashMap<>();
-    }
+    private final Map<Integer, Node> map = new HashMap<>();
 
     public void linkList(Task element) {
         final Node oldTail = tail;
@@ -21,7 +16,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.setNext(newNode);
+            oldTail.next = newNode;
         }
         map.put(element.getId(), newNode);
     }
@@ -29,15 +24,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getTasks() throws IllegalStateException {
         List<Task> tasksHistory = new ArrayList<>();
         Node node = head;
-        if (node.getData() == null) {
+        if (node.task == null) {
             throw new IllegalStateException("История просмотров пуста");
         }
-        while (true) {
-            if (node == null) {
-                break;
-            }
-            tasksHistory.add(node.getData());
-            node = node.getNext();
+        while (node != null) {
+            tasksHistory.add(node.task);
+            node = node.next;
         }
         return tasksHistory;
     }
@@ -49,10 +41,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (map.containsKey(task.getId())) {
             remove(task.getId());
-            linkList(task);
-        } else {
-            linkList(task);
         }
+        linkList(task);
     }
 
     public void remove(int id) {
@@ -60,25 +50,35 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void removeNode(Node node) {
-        Node prev = node.getPrev();
-        Node next = node.getNext();
+        Node prev = node.prev;
+        Node next = node.next;
         if (prev == null) {
             if (next != null) {
                 head = next;
-                head.setPrev(null);
+                head.prev = null;
                 return;
             }
             tail = null;
             return;
         }
         if (next == null) {
-            prev.setNext(null);
+            prev.next = null;
             tail = prev;
             return;
         }
-        prev.setNext(next);
-        next.setPrev(prev);
+        prev.next = next;
+        next.prev = prev;
     }
 
+    private static class Node {
+        private final Task task;
+        private Node next;
+        private Node prev;
 
+        public Node(Node prev, Task task, Node next) {
+            this.task = task;
+            this.next = next;
+            this.prev = prev;
+        }
+    }
 }
