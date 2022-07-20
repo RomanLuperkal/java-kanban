@@ -15,6 +15,11 @@ public class Epic extends Task {
         subtasks = new HashMap<>();
     }
 
+    public Epic(Integer id, String name, Status status, String description) {
+        super(id, name, status, description);
+        subtasks = new HashMap<>();
+    }
+
     public void checkSubtasksStatus() {
         int count = 0;
 
@@ -53,16 +58,12 @@ public class Epic extends Task {
 
     public void createSubtask(int id, Subtask subtask) {
         subtask.setId(id);
+        subtask.setEpicID(getId());
         subtasks.put(id, subtask);
     }
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "listSubtasks=" + subtasks +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return getId() + "," + Tasks.EPIC + "," + this.name + "," + this.status + "," + this.description;
     }
 }
