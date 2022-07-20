@@ -1,3 +1,5 @@
+package managers;
+
 import tasks.*;
 
 public interface TestObjects {
