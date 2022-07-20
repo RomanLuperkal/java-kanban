@@ -24,7 +24,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getTasks() throws IllegalStateException {
         List<Task> tasksHistory = new ArrayList<>();
         Node node = head;
-        if (node.task == null) {
+        if (node == null || node.task == null) {
             throw new IllegalStateException("История просмотров пуста");
         }
         while (node != null) {
