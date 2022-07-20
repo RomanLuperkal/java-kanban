@@ -1,6 +1,6 @@
-import managers.HistoryManager;
-import managers.InMemoryTaskManager;
-import managers.TaskManager;
+package managers;
+
+import Exceptions.ManagerSaveException;
 import tasks.*;
 
 import java.io.*;
@@ -280,17 +280,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public static void main(String[] args) {
         File file = new File("save.csv");
         var fileBackedTasksManager1 = new FileBackedTasksManager(file);
-        fileBackedTasksManager1.createTask(task);
-        fileBackedTasksManager1.createEpicTask(epicTask1);
-        fileBackedTasksManager1.createEpicTask(epicTask2);
-        fileBackedTasksManager1.createSubtask(epicTask1.getId(), subtask1ForEpicTask1);
-        fileBackedTasksManager1.createSubtask(epicTask1.getId(), subtask2ForEpicTask1);
-        fileBackedTasksManager1.createSubtask(epicTask2.getId(), subtask3ForEpicTask1);
-        epicTask1.changeStatus(Status.IN_PROGRESS);
-        fileBackedTasksManager1.getTask(task.getId());
-        fileBackedTasksManager1.getEpicTask(epicTask1.getId());
-        fileBackedTasksManager1.getSubtask(subtask3ForEpicTask1.getId());
-        fileBackedTasksManager1.getSubtask(subtask2ForEpicTask1.getId());
+        fileBackedTasksManager1.createTask(TestObjects.task);
+        fileBackedTasksManager1.createEpicTask(TestObjects.epicTask1);
+        fileBackedTasksManager1.createEpicTask(TestObjects.epicTask2);
+        fileBackedTasksManager1.createSubtask(TestObjects.epicTask1.getId(), TestObjects.subtask1ForEpicTask1);
+        fileBackedTasksManager1.createSubtask(TestObjects.epicTask1.getId(), TestObjects.subtask2ForEpicTask1);
+        fileBackedTasksManager1.createSubtask(TestObjects.epicTask2.getId(), TestObjects.subtask3ForEpicTask1);
+        TestObjects.epicTask1.changeStatus(Status.IN_PROGRESS);
+        fileBackedTasksManager1.getTask(TestObjects.task.getId());
+        fileBackedTasksManager1.getEpicTask(TestObjects.epicTask1.getId());
+        fileBackedTasksManager1.getSubtask(TestObjects.subtask3ForEpicTask1.getId());
+        fileBackedTasksManager1.getSubtask(TestObjects.subtask2ForEpicTask1.getId());
 
         var fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
         System.out.println("e");
