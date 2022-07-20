@@ -6,7 +6,7 @@ public class Task {
     protected String name;
     protected String description;
     protected Status status;
-    protected int id;
+    protected Integer id;
 
     public Task(String name, String description) {
 
@@ -15,8 +15,15 @@ public class Task {
         this.status = Status.NEW;
     }
 
+    public Task(Integer id, String name, Status status, String description) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.description = description;
+    }
 
-    public int getId() {
+
+    public Integer getId() {
         return id;
     }
 
@@ -34,7 +41,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task that = (Task) o;
-        return id == that.id && name.equals(that.name) && description.equals(that.description) && status == that.status;
+        return id.equals(that.id) && name.equals(that.name) && description.equals(that.description) && status == that.status;
     }
 
     @Override
@@ -44,10 +51,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return getId() + "," + Tasks.TASK + "," + this.name + "," + this.status + "," + this.description;
     }
 }
