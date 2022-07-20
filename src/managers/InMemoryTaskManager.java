@@ -136,8 +136,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createSubtask(int epicTaskId, Subtask subtask) throws IllegalStateException {
-        if (epics.get(epicTaskId) == null) {
+    public void createSubtask(Integer epicTaskId, Subtask subtask) throws IllegalStateException {
+        if (epics.get(epicTaskId) == null || epicTaskId == null) {
             throw new IllegalStateException("Такой эпической задачи нет");
         }
         Epic epic = epics.get(epicTaskId);
@@ -233,4 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
+    protected HistoryManager getHistoryManager() {
+        return history;
+    }
 }
