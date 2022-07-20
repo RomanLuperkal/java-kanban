@@ -27,7 +27,7 @@ public interface TaskManager {
 
     void createEpicTask(Epic epic);
 
-    void createSubtask(int epicTaskId, Subtask subtask);
+    void createSubtask(Integer epicTaskId, Subtask subtask);
 
     void updateTask(Task task);
 
