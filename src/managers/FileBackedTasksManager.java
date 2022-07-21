@@ -1,6 +1,6 @@
 package managers;
 
-import Exceptions.ManagerSaveException;
+import exceptions.ManagerSaveException;
 import tasks.*;
 
 import java.io.*;
@@ -151,7 +151,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private void save() {
         StringBuilder sb = new StringBuilder("id,type,name,status,description,epic\n");
-        taskToString(sb);
+        try {
+            for (Task task : super.getTasks()) {
+                sb.append(taskToString(task)).append("\n");
+            }
+        } catch (IllegalStateException e) {
+            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия задач
+        }
+
+        try {
+            for (Task epic : super.getEpicTasks()) {
+                sb.append(taskToString(epic)).append("\n");
+            }
+        } catch (IllegalStateException e) {
+            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия епиков
+        }
+
+        try {
+            for (Task subtask : super.getSubtasks()) {
+                sb.append(taskToString(subtask)).append("\n");
+            }
+        } catch (IllegalStateException e) {
+            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия сабок
+        }
+       // taskToString(sb);
         sb.append("\n");
         try {
             sb.append(historyToString(super.getHistoryManager()));
@@ -166,30 +189,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
-    private void taskToString(StringBuilder sb) {
-        try {
-            for (Task task : super.getTasks()) {
-                sb.append(task.toString()).append("\n");
-            }
-        } catch (IllegalStateException e) {
-            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия задач
-        }
-
-        try {
-            for (Task epic : super.getEpicTasks()) {
-                sb.append(epic.toString()).append("\n");
-            }
-        } catch (IllegalStateException e) {
-            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия епиков
-        }
-
-        try {
-            for (Task subtask : super.getSubtasks()) {
-                sb.append(subtask.toString()).append("\n");
-            }
-        } catch (IllegalStateException e) {
-            //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия сабок
-        }
+    private String taskToString(Task task) {
+        return task.toString();
     }
 
     private static String historyToString(HistoryManager manager) throws IllegalStateException {
@@ -203,11 +204,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private static Task taskFromString(final String value) {
         String[] data = value.split(",");
-        if (data[1].equals(Tasks.TASK.toString())) {
+        if (data[1].equals(TaskType.TASK.toString())) {
             return new Task(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]);
-        } else if (data[1].equals(Tasks.EPIC.toString())) {
+        } else if (data[1].equals(TaskType.EPIC.toString())) {
             return new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]);
-        } else if (data[1].equals(Tasks.SUBTASK.toString())) {
+        } else if (data[1].equals(TaskType.SUBTASK.toString())) {
             return new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
                     , Integer.parseInt(data[5]));
         }
