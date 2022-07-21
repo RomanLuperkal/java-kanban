@@ -7,9 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,16 +109,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
 
         var fileBackedTasksManager = new FileBackedTasksManager(file);
+        Map<Integer, Task> tasks = new TreeMap<>();
         for (int i = 0; i < content.size() - 2; i++) {
-            Task task = FileBackedTasksManager.taskFromString(content.get(i));
-            if (task instanceof Subtask) {
-                String[] data = content.get(i).split(",");
-                fileBackedTasksManager.loadSubtaskFromFile(Integer.parseInt(data[data.length - 1]), (Subtask) task);
-            } else if (task instanceof Epic) {
-                fileBackedTasksManager.loadEpicFromFile((Epic) task);
-            } else {
-                fileBackedTasksManager.loadTaskFromFile(task);
-            }
+            tasks.putAll(FileBackedTasksManager.taskFromString(content.get(i)));
+        }
+        for (Task task : tasks.values()) {
+            fileBackedTasksManager.loadTaskFromFile(task);
         }
         List<Integer> historyData = FileBackedTasksManager.historyFromString(content.get(content.size() - 1));
         if (historyData != null) {
@@ -202,17 +196,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return sb.toString();
     }
 
-    private static Task taskFromString(final String value) {
+    private static Map<Integer, Task> taskFromString(final String value) {
         String[] data = value.split(",");
+        Map<Integer, Task> tasks = new TreeMap<>();
         if (data[1].equals(TaskType.TASK.toString())) {
-            return new Task(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]);
+            tasks.put(Integer.parseInt(data[0]), new Task(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
         } else if (data[1].equals(TaskType.EPIC.toString())) {
-            return new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]);
+            tasks.put(Integer.parseInt(data[0]), new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
         } else if (data[1].equals(TaskType.SUBTASK.toString())) {
-            return new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
-                    , Integer.parseInt(data[5]));
+            tasks.put(Integer.parseInt(data[0]), new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
+                    , Integer.parseInt(data[5])));
         }
-        return null;
+        return tasks;
     }
 
     private static List<Integer> historyFromString(final String value) {
@@ -223,16 +218,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+
+
     private void loadTaskFromFile(Task task) {
-        super.createTask(task);
-    }
-
-    private void loadEpicFromFile(Epic epic) {
-        super.createEpicTask(epic);
-    }
-
-    private void loadSubtaskFromFile(Integer epicId, Subtask subtask) {
-        super.createSubtask(epicId, subtask);
+        if (task instanceof Subtask) {
+            super.createSubtask(((Subtask) task).getEpicID(), (Subtask) task);
+        } else if (task instanceof Epic) {
+            super.createEpicTask((Epic) task);
+        } else {
+            super.createTask(task);
+        }
     }
 
     private void loadTaskHistoryFromFile(Integer id) {
@@ -283,11 +278,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         var fileBackedTasksManager1 = new FileBackedTasksManager(file);
         fileBackedTasksManager1.createTask(TestObjects.task);
         fileBackedTasksManager1.createEpicTask(TestObjects.epicTask1);
-        fileBackedTasksManager1.createEpicTask(TestObjects.epicTask2);
         fileBackedTasksManager1.createSubtask(TestObjects.epicTask1.getId(), TestObjects.subtask1ForEpicTask1);
-        fileBackedTasksManager1.createSubtask(TestObjects.epicTask1.getId(), TestObjects.subtask2ForEpicTask1);
+        fileBackedTasksManager1.createEpicTask(TestObjects.epicTask2);
         fileBackedTasksManager1.createSubtask(TestObjects.epicTask2.getId(), TestObjects.subtask3ForEpicTask1);
-        TestObjects.epicTask1.changeStatus(Status.IN_PROGRESS);
+        fileBackedTasksManager1.createSubtask(TestObjects.epicTask1.getId(), TestObjects.subtask2ForEpicTask1);
+        epicTask1.changeStatus(Status.IN_PROGRESS);
         fileBackedTasksManager1.getTask(TestObjects.task.getId());
         fileBackedTasksManager1.getEpicTask(TestObjects.epicTask1.getId());
         fileBackedTasksManager1.getSubtask(TestObjects.subtask3ForEpicTask1.getId());
