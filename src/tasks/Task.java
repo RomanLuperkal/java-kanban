@@ -51,6 +51,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return getId() + "," + Tasks.TASK + "," + this.name + "," + this.status + "," + this.description;
+        return getId() + "," + TaskType.TASK + "," + this.name + "," + this.status + "," + this.description;
     }
 }
