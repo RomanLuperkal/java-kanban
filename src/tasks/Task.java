@@ -15,8 +15,7 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    public Task(Integer id, String name, Status status, String description) {
-        this.id = id;
+    public Task(String name, Status status, String description) {
         this.name = name;
         this.status = status;
         this.description = description;

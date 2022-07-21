@@ -200,11 +200,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         String[] data = value.split(",");
         Map<Integer, Task> tasks = new TreeMap<>();
         if (data[1].equals(TaskType.TASK.toString())) {
-            tasks.put(Integer.parseInt(data[0]), new Task(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
+            tasks.put(Integer.parseInt(data[0]), new Task(data[2], Status.parseStatus(data[3]), data[4]));
         } else if (data[1].equals(TaskType.EPIC.toString())) {
-            tasks.put(Integer.parseInt(data[0]), new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
+            tasks.put(Integer.parseInt(data[0]), new Epic(data[2], Status.parseStatus(data[3]), data[4]));
         } else if (data[1].equals(TaskType.SUBTASK.toString())) {
-            tasks.put(Integer.parseInt(data[0]), new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
+            tasks.put(Integer.parseInt(data[0]), new Subtask(data[2], Status.parseStatus(data[3]), data[4]
                     , Integer.parseInt(data[5])));
         }
         return tasks;
