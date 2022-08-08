@@ -1,30 +1,33 @@
 package managers;
 
+import exceptions.TaskDateDurationException;
 import tasks.*;
 
 import java.lang.IllegalStateException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks;
+    private final Map<Integer, SimpleTask> tasks;
     private final Map<Integer, Epic> epics;
     private final HistoryManager history;
     private int taskId;
+    private final Set<Task> sortedTasks;
+    private final ValidationTaskManager validator;
 
     public InMemoryTaskManager() {
         epics = new HashMap<>();
         tasks = new HashMap<>();
+        sortedTasks = new TreeSet<>();
         history = Managers.getDefaultHistory();
+        validator = new ValidationTaskManager();
         this.taskId = 0;
     }
 
     @Override
-    public List<Task> getTasks() throws IllegalStateException {
+    public List<SimpleTask> getSimpleTasks() throws IllegalStateException {
         if (tasks.isEmpty()) {
-            throw new IllegalStateException("Список простых задач пуст");
+            throw new IllegalStateException("Список простых задач пуст.");
         } else {
             return new ArrayList<>(tasks.values());
         }
@@ -46,14 +49,14 @@ public class InMemoryTaskManager implements TaskManager {
             listSubtasks.addAll(epic.getSubtasks());
         }
         if (listSubtasks.isEmpty()) {
-            throw new IllegalStateException("Подзадач нет");
+            throw new IllegalStateException("Список подзадач пуст");
         } else {
             return listSubtasks;
         }
     }
 
     @Override
-    public void deleteTasks() {
+    public void deleteSimpleTasks() {
         for (int key : tasks.keySet()) {
             history.remove(key);
         }
@@ -90,8 +93,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(int id) throws IllegalStateException {
-        if (tasks.get(id) == null) {
+    public SimpleTask getSimpleTask(int id) throws IllegalStateException {
+        if (tasks.isEmpty()) {
+            throw new IllegalStateException("Список простых задач пуст.");
+        }
+        if (tasks.get(id) == null || !tasks.containsKey(id)) {
             throw new IllegalStateException("Такой задачи нет");
         } else {
             history.add(tasks.get(id));
@@ -102,8 +108,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicTask(int id) throws IllegalStateException {
-        if (epics.get(id) == null) {
-            throw new IllegalStateException("Такой задачи нет");
+        if (epics.isEmpty()) {
+            throw new IllegalStateException("Список эпических задач пуст.");
+        }
+        if (epics.get(id) == null || !epics.containsKey(id)) {
+            throw new IllegalStateException("Такой эпической задачи нет");
         } else {
             history.add(epics.get(id));
             return epics.get(id);
@@ -124,13 +133,23 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) {
+    public void createSimpleTask(SimpleTask task) {
+        if (tasks.containsKey(task.getId())) {
+            throw new IllegalStateException("Ошибка создания простой задачи! Такая задача уже есть.");
+        }
+        if (validator.validation(task)) {
+            throw new TaskDateDurationException("Время начала задач не может пересекаться");
+        }
         task.setId(getTaskId());
         tasks.put(task.getId(), task);
+        sortedTasks.add(task);
     }
 
     @Override
     public void createEpicTask(Epic epic) {
+        if (epics.containsKey(epic.getId())) {
+            throw new IllegalStateException("Ошибка создания эпической задачи! Такая задача уже есть.");
+        }
         epic.setId(getTaskId());
         epics.put(epic.getId(), epic);
     }
@@ -138,15 +157,25 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubtask(Integer epicTaskId, Subtask subtask) throws IllegalStateException {
         if (epics.get(epicTaskId) == null || epicTaskId == null) {
-            throw new IllegalStateException("Такой эпической задачи нет");
+            throw new IllegalStateException("Ошибка создания подзадачи. Такой эпической задачи нет");
         }
         Epic epic = epics.get(epicTaskId);
+        Map<Integer, Subtask> subtasks = epic.getMapSubtasks();
+        if (subtasks.containsKey(subtask.getId())) {
+            throw new IllegalStateException("Ошибка создания подзадачи! Такая задача в эпике с id="
+                    + epicTaskId + " уже есть.");
+        }
+        if (validator.validation(subtask)) {
+            throw new TaskDateDurationException("Время начала подзадач не может пересекаться");
+        }
         subtask.setId(getTaskId());
         epic.createSubtask(subtask.getId(), subtask);
+        epic.checkSubtasksStatus();
+        sortedTasks.add(subtask);
     }
 
     @Override
-    public void updateTask(Task task) throws IllegalStateException {
+    public void updateSimpleTask(SimpleTask task) throws IllegalStateException {
         if (!tasks.containsKey(task.getId())) {
             throw new IllegalStateException("Ошибка обновления задачи! Такой задачи нет.");
         }
@@ -178,10 +207,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(int id) throws IllegalStateException {
+    public void deleteSimpleTask(int id) throws IllegalStateException {
         if (!tasks.containsKey(id)) {
             throw new IllegalStateException("Ошибка удаления задачи! Такой задачи нет");
         }
+        LocalDateTime taskDatetime = getSimpleTask(id).getStartTime();
+        validator.deleteTaskDateTime(taskDatetime);
+        sortedTasks.remove(getSimpleTask(id));
         history.remove(id);
         tasks.remove(id);
     }
@@ -195,6 +227,8 @@ public class InMemoryTaskManager implements TaskManager {
         for (Subtask sub : subtasks) {
             history.remove(sub.getId());
         }
+        LocalDateTime taskDatetime = getEpicTask(id).getStartTime();
+        validator.deleteTaskDateTime(taskDatetime);
         history.remove(id);
         epics.remove(id);
     }
@@ -205,6 +239,9 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             subtasks = epic.getMapSubtasks();
             if (subtasks.containsKey(id)) {
+                LocalDateTime taskDatetime = getSubtask(id).getStartTime();
+                validator.deleteTaskDateTime(taskDatetime);
+                sortedTasks.remove(getSubtask(id));
                 history.remove(id);
                 subtasks.remove(id);
                 epic.checkSubtasksStatus();
@@ -217,7 +254,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getListSubtasksByEpicTaskId(int id) throws IllegalStateException {
         if (!epics.containsKey(id)) {
-            throw new IllegalStateException("Ошибка получения списка подзадач! Эпической задачи с таким id нет.");
+            throw new IllegalStateException("Ошибка получения списка подзадач! Эпической задачи с id=" + id + " нет.");
         }
         Epic epic = epics.get(id);
         return epic.getSubtasks();
@@ -226,6 +263,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return history.getHistory();
+    }
+
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(sortedTasks);
     }
 
     private int getTaskId() {
