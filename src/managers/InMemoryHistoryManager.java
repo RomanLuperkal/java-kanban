@@ -46,19 +46,21 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void remove(int id) {
-        removeNode(map.get(id));
+        Optional<Node> node = Optional.ofNullable(map.get(id));
+        node.ifPresent(this::removeNode);
     }
 
     public void removeNode(Node node) {
         Node prev = node.prev;
         Node next = node.next;
-        if (prev == null) {
-            if (next != null) {
-                head = next;
-                head.prev = null;
-                return;
-            }
+        if (prev == null && next == null) {
+            head = null;
             tail = null;
+            return;
+        }
+        if (prev == null) {
+            head = next;
+            head.prev = null;
             return;
         }
         if (next == null) {
