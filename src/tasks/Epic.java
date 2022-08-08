@@ -1,16 +1,14 @@
 package tasks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Epic extends Task {
 
     Map<Integer, Subtask> subtasks;
 
     public Epic(String name, String description) {
-
         super(name, description);
         subtasks = new HashMap<>();
     }
@@ -44,14 +42,6 @@ public class Epic extends Task {
         subtasks.clear();
     }
 
-    public Subtask getSubtask(int id) throws IllegalStateException {
-        if (subtasks.get(id) == null) {
-            throw new IllegalStateException("Такой подзадачи нет");
-        } else {
-            return subtasks.get(id);
-        }
-    }
-
     public Map<Integer, Subtask> getMapSubtasks() {
         return subtasks;
     }
@@ -60,10 +50,62 @@ public class Epic extends Task {
         subtask.setId(id);
         subtask.setEpicID(getId());
         subtasks.put(id, subtask);
+        calculationStartTime();
+        calculationDuration();
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime != null) {
+            return startTime.plus(duration);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return subtasks.equals(epic.subtasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), subtasks);
     }
 
     @Override
     public String toString() {
-        return getId() + "," + TaskType.EPIC + "," + this.name + "," + this.status + "," + this.description;
+        //Optional<LocalDateTime> date = Optional.ofNullable(startTime);
+        String startDateToString = Optional.ofNullable(startTime)
+                .map(localDateTime -> localDateTime.format(formatter)).orElse("null");
+        String durationToString = Optional.ofNullable(duration)
+                .map(duration -> Long.toString(duration.toMinutes())).orElse("null");
+        return getId() + "," + TaskType.EPIC + "," + this.name + "," + this.status + "," + this.description
+                + "," + startDateToString + "," + durationToString;
+    }
+
+    private void calculationStartTime() {
+        Comparator<Subtask> comparator = (sub1, sub2) -> {
+            LocalDateTime dateTimeSub1 = sub1.getStartTime();
+            LocalDateTime dateTimeSub2 = sub2.getStartTime();
+            return -dateTimeSub1.compareTo(dateTimeSub2);
+        };
+        Optional<Subtask> maxStartDate = subtasks.values().stream().filter(sub -> sub.getStartTime() != null)
+                .max(comparator);
+        maxStartDate.ifPresent(subtask -> this.startTime = subtask.getStartTime());
+    }
+
+    private void calculationDuration() {
+        Comparator<Subtask> comparator = (sub1, sub2) -> {
+            LocalDateTime dateTimeSub1 = sub1.getEndTime();
+            LocalDateTime dateTimeSub2 = sub2.getEndTime();
+            return dateTimeSub1.compareTo(dateTimeSub2);
+        };
+        Optional<Subtask> duration = subtasks.values().stream().filter(sub -> sub.getEndTime() != null)
+                .max(comparator);
+        duration.ifPresent(subtask -> this.duration = Duration.between(this.startTime
+                , subtask.getEndTime()));
     }
 }
