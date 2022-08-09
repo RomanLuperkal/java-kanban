@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, SimpleTask> tasks;
-    private final Map<Integer, Epic> epics;
-    private final HistoryManager history;
-    private int taskId;
-    private final Set<Task> sortedTasks;
-    private final ValidationTaskManager validator;
+    protected final Map<Integer, SimpleTask> tasks;
+    protected final Map<Integer, Epic> epics;
+    protected final HistoryManager history;
+    protected int taskId;
+    protected final Set<Task> sortedTasks;
+    protected final ValidationTaskManager validator;
 
     public InMemoryTaskManager() {
         epics = new HashMap<>();
@@ -57,12 +57,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSimpleTasks() {
-        for (int key : tasks.keySet()) {
-            history.remove(key);
-        }
-        for (SimpleTask task : tasks.values()) {
-            sortedTasks.remove(task);
-            validator.deleteTaskDateTime(task.getStartTime());
+        for (Map.Entry<Integer, SimpleTask> entry : tasks.entrySet()) {
+            history.remove(entry.getKey());
+            sortedTasks.remove(entry.getValue());
+            validator.deleteTaskDateTime((entry.getValue()).getStartTime());
         }
         tasks.clear();
     }
@@ -89,12 +87,10 @@ public class InMemoryTaskManager implements TaskManager {
         Map<Integer, Subtask> subtasks;
         for (Epic epic : epics.values()) {
             subtasks = epic.getMapSubtasks();
-            for (int key : subtasks.keySet()) {
-                history.remove(key);
-            }
-            for (Subtask subtask : subtasks.values()) {
-                sortedTasks.remove(subtask);
-                validator.deleteTaskDateTime(subtask.getStartTime());
+            for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
+                history.remove(entry.getKey());
+                sortedTasks.remove(entry.getValue());
+                validator.deleteTaskDateTime((entry.getValue()).getStartTime());
             }
             epic.deleteSubtasks();
         }
