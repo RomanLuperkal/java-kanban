@@ -24,13 +24,12 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     @Test
     public void testSaveEmptyListTasksInFile() {
         List<String> testContent;
-        String pathTestFile = new File("").getAbsolutePath() + File.separator + "EtalonSaveFiles"
-                + File.separator + "EtalonEmptyList.csv";
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyList.csv";
+        String pathTestFile = new File("src" + File.separator + "test" + File.separator + "test-resources"
+                + File.separator + "EtalonSaveFiles" + File.separator + "EtalonEmptyList.csv").getAbsolutePath();
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyList.csv").getAbsolutePath();
         try (Stream<String> lines = Files.lines(Path.of(pathTestFile))) {
             testContent = lines.collect(Collectors.toCollection(ArrayList::new));
-
         } catch (IOException e) {
             System.err.println("Ошибка! Не удалось прочитать файл.");
             return;
@@ -52,8 +51,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
 
     @Test
     public void testRecoveryEmptyListTasksFromFile() {
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyList.csv";
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyList.csv").getAbsolutePath();
         ManagerLoadException e = assertThrows(ManagerLoadException.class, () -> FileBackedTasksManager
                 .loadFromFile(new File(pathManagerSaveFile)));
         assertNotNull(e.getMessage(), "Отсутствует сообщение об ошибке");
@@ -63,14 +62,13 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     @Test
     public void testSaveTasksInFile() {
         List<String> testContent;
-        String pathTestFile = new File("").getAbsolutePath() + File.separator + "EtalonSaveFiles"
-                + File.separator + "EtalonWithTasksList.csv";
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "WithTasksList.csv";
-
+        String pathTestFile = new File("src" + File.separator + "test" + File.separator + "test-resources"
+                + File.separator + "EtalonSaveFiles" + File.separator + "EtalonWithTasksList.csv").getAbsolutePath();
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator
+                + "WithTasksList.csv").getAbsolutePath();
         try (Stream<String> lines = Files.lines(Path.of(pathTestFile))) {
             testContent = lines.collect(Collectors.toCollection(ArrayList::new));
-
         } catch (IOException e) {
             System.err.println("Ошибка! Не удалось прочитать файл.");
             return;
@@ -86,7 +84,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         List<String> contentManager;
         try (Stream<String> lines = Files.lines(Path.of(pathManagerSaveFile))) {
             contentManager = lines.collect(Collectors.toCollection(ArrayList::new));
-
         } catch (IOException e) {
             System.err.println("Ошибка! Не удалось прочитать файл.");
             return;
@@ -96,9 +93,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
 
     @Test
     public void testRecoveryTasksFromFile() {
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "WithTasksList.csv";
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator
+                + "WithTasksList.csv").getAbsolutePath();
         FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
+        assertNotNull(manager, "Менеджер задач не был загружен");
         task1.setId(0);
         epic1.setId(1);
         subtask1.setId(2);
@@ -116,12 +115,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     @Test
     public void testSaveEmptyEpicInFile() {
         List<String> testContent;
-        String pathTestFile = new File("").getAbsolutePath() + File.separator + "EtalonSaveFiles"
-                + File.separator + "EtalonEmptyEpic.csv";
-
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyEpic.csv";
-
+        String pathTestFile = new File("src" + File.separator + "test" + File.separator + "test-resources"
+                + File.separator + "EtalonSaveFiles" + File.separator + "EtalonEmptyEpic.csv").getAbsolutePath();
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyEpic.csv").getAbsolutePath();
         try (Stream<String> lines = Files.lines(Path.of(pathTestFile))) {
             testContent = lines.collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
@@ -144,12 +141,13 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
 
     @Test
     public void testRecoveryEmptyEpicFromFile() {
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyEpic.csv";
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyEpic.csv").getAbsolutePath();
         FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
         epic1.setId(0);
         List<Task> existEpicsList = new ArrayList<>(List.of(epic1));
         List<Task> existHistory = new ArrayList<>(List.of(epic1));
+        assertNotNull(manager, "Менеджер задач не был загружен");
         assertEquals(existEpicsList, manager.getEpicTasks(), "Задачи не совпадают");
         assertEquals(existHistory, manager.getHistory(), "Задачи не совпадают");
     }
@@ -157,10 +155,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     @Test
     public void testSaveEmptyHistoryInFile() {
         List<String> testContent;
-        String pathTestFile = new File("").getAbsolutePath() + File.separator + "EtalonSaveFiles"
-                + File.separator + "EtalonEmptyHistory.csv";
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyHistory.csv";
+        String pathTestFile = new File("src" + File.separator + "test" + File.separator + "test-resources"
+                + File.separator + "EtalonSaveFiles" + File.separator + "EtalonEmptyHistory.csv").getAbsolutePath();
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator
+                + "EmptyHistory.csv").getAbsolutePath();
         try (Stream<String> lines = Files.lines(Path.of(pathTestFile))) {
             testContent = lines.collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException e) {
@@ -183,13 +182,15 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
 
     @Test
     public void testRecoveryEmptyHistoryFromFile() {
-        String pathManagerSaveFile = new File("").getAbsolutePath() + File.separator + "TestSaves"
-                + File.separator + "EmptyHistory.csv";
+        String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
+                + "test-resources" + File.separator + "TestSaves" + File.separator
+                + "EmptyHistory.csv").getAbsolutePath();
         FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
         task1.setId(0);
         epic1.setId(1);
         List<Task> existListEpics = new ArrayList<>(List.of(epic1));
         List<Task> existListTasks = new ArrayList<>(List.of(task1));
+        assertNotNull(manager, "Менеджер задач не был загружен");
         assertEquals(existListEpics, manager.getEpicTasks(), "Задачи не совпадают");
         assertEquals(existListTasks, manager.getSimpleTasks(), "Задачи не совпадают");
 
