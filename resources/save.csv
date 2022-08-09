@@ -1,0 +1,8 @@
+id,type,name,status,description,epic,startTime,duration
+0,TASK,Task,NEW,Description task,08.08.2022 00:30,60
+1,EPIC,Epic 1,IN_PROGRESS,Description epic task,08.08.2022 00:40,100
+3,EPIC,Epic 2,NEW,Description epic task,null,null
+2,SUBTASK,sub1 for ep1,IN_PROGRESS,Description sub1 for ep 1,1,08.08.2022 00:40,60
+5,SUBTASK,sub2 for ep1,NEW,Description sub2 for ep 1,1,08.08.2022 01:20,60
+4,SUBTASK,sub3 for ep2,NEW,Description sub3 for ep 2,3,null,null
+
