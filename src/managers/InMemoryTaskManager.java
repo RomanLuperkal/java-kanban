@@ -60,6 +60,10 @@ public class InMemoryTaskManager implements TaskManager {
         for (int key : tasks.keySet()) {
             history.remove(key);
         }
+        for (SimpleTask task : tasks.values()) {
+            sortedTasks.remove(task);
+            validator.deleteTaskDateTime(task.getStartTime());
+        }
         tasks.clear();
     }
 
@@ -87,6 +91,10 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks = epic.getMapSubtasks();
             for (int key : subtasks.keySet()) {
                 history.remove(key);
+            }
+            for (Subtask subtask : subtasks.values()) {
+                sortedTasks.remove(subtask);
+                validator.deleteTaskDateTime(subtask.getStartTime());
             }
             epic.deleteSubtasks();
         }
