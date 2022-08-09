@@ -21,7 +21,7 @@ class InMemoryHistoryManagerTest {
     private static SimpleTask task2;
     private static Epic epic1;
     private static Subtask subtask1;
-    InMemoryHistoryManager historyManager;
+    private InMemoryHistoryManager historyManager;
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     @BeforeEach
