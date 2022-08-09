@@ -17,9 +17,9 @@ public class SimpleTask extends Task {
         super(name, status, description);
     }
 
-    public SimpleTask(String name, Status status, String description, String DataTime, Integer durationMin) {
+    public SimpleTask(String name, Status status, String description, String dataTime, Integer durationMin) {
         super(name, status, description);
-        this.startTime = LocalDateTime.parse(DataTime, formatter);
+        this.startTime = LocalDateTime.parse(dataTime, formatter);
         this.duration = Duration.ofMinutes(durationMin);
     }
 
