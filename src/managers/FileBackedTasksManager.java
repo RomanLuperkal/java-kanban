@@ -158,6 +158,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 }
             }
         }
+        Optional<Integer> managerId = tasks.keySet().stream().max(Integer::compare);
+        fileBackedTasksManager.recoverIdManager(managerId.orElseThrow(()
+                -> new ManagerLoadException("Ошибка восстановления id менеджера")) + 1);
         return fileBackedTasksManager;
     }
 
@@ -317,6 +320,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             return data.get(data.size() - 1).matches("(\\d|(\\d+,)+(\\d+)$)");
         }
         return true;
+    }
+
+    private void recoverIdManager(Integer id) {
+        this.taskId = id;
     }
 
     public static void main(String[] args) {
