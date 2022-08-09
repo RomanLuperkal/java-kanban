@@ -13,14 +13,16 @@ public class SimpleTask extends Task {
         super(name, description);
     }
 
-    public SimpleTask(String name, Status status, String description) {
+    public SimpleTask(Integer id, String name, Status status, String description) {
         super(name, status, description);
+        this.id = id;
     }
 
-    public SimpleTask(String name, Status status, String description, String dataTime, Integer durationMin) {
+    public SimpleTask(Integer id, String name, Status status, String description, String dataTime, Integer durationMin) {
         super(name, status, description);
         this.startTime = LocalDateTime.parse(dataTime, formatter);
         this.duration = Duration.ofMinutes(durationMin);
+        this.id = id;
     }
 
     public SimpleTask(String name, String description, String DataTime, Integer durationMin) {

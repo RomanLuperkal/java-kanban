@@ -220,21 +220,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         Map<Integer, Task> tasks = new TreeMap<>();
         if (data[6].equals("null")) {
             if (data[1].equals(TaskType.TASK.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new SimpleTask(data[2], Status.parseStatus(data[3]), data[4]));
+                tasks.put(Integer.parseInt(data[0]), new SimpleTask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
             } else if (data[1].equals(TaskType.EPIC.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new Epic(data[2], Status.parseStatus(data[3]), data[4]));
+                tasks.put(Integer.parseInt(data[0]), new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
             } else if (data[1].equals(TaskType.SUBTASK.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new Subtask(data[2], Status.parseStatus(data[3]), data[4]
+                tasks.put(Integer.parseInt(data[0]), new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
                         , Integer.parseInt(data[5])));
             }
         } else {
             if (data[1].equals(TaskType.TASK.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new SimpleTask(data[2], Status.parseStatus(data[3]), data[4]
+                tasks.put(Integer.parseInt(data[0]), new SimpleTask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
                         , data[5], Integer.parseInt(data[6])));
             } else if (data[1].equals(TaskType.EPIC.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new Epic(data[2], Status.parseStatus(data[3]), data[4]));
+                tasks.put(Integer.parseInt(data[0]), new Epic(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]));
             } else if (data[1].equals(TaskType.SUBTASK.toString())) {
-                tasks.put(Integer.parseInt(data[0]), new Subtask(data[2], Status.parseStatus(data[3]), data[4]
+                tasks.put(Integer.parseInt(data[0]), new Subtask(Integer.parseInt(data[0]), data[2], Status.parseStatus(data[3]), data[4]
                         , data[6], Integer.parseInt(data[7]), Integer.parseInt(data[5])));
             }
         }
@@ -253,11 +253,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private void loadTaskFromFile(Task task) {
         if (task instanceof Subtask) {
-            super.createSubtask(((Subtask) task).getEpicID(), (Subtask) task);
+            Subtask subtask = (Subtask) task;
+            Epic epic = epics.get(subtask.getEpicID());
+            validator.validation(subtask);
+            epic.createSubtask(subtask.getId(), subtask);
+            epic.checkSubtasksStatus();
+            sortedTasks.add(subtask);
         } else if (task instanceof Epic) {
-            super.createEpicTask((Epic) task);
+            Epic epic = (Epic) task;
+            epics.put(epic.getId(), epic);
+            validator.validation(epic);
         } else {
-            super.createSimpleTask((SimpleTask) task);
+            SimpleTask simpleTask = (SimpleTask) task;
+            tasks.put(task.getId(), simpleTask);
+            sortedTasks.add(simpleTask);
+            validator.validation(task);
         }
     }
 

@@ -14,16 +14,18 @@ public class Subtask extends Task {
         super(name, description);
     }
 
-    public Subtask(String name, Status status, String description, Integer epicID) {
+    public Subtask(Integer id, String name, Status status, String description, Integer epicID) {
         super(name, status, description);
         this.epicID = epicID;
+        this.id = id;
     }
 
-    public Subtask(String name, Status status, String description, String DataTime, Integer durationMin, Integer epicID) {
+    public Subtask(Integer id, String name, Status status, String description, String DataTime, Integer durationMin, Integer epicID) {
         super(name, status, description);
         this.startTime = LocalDateTime.parse(DataTime, formatter);
         this.duration = Duration.ofMinutes(durationMin);
         this.epicID = epicID;
+        this.id = id;
     }
 
     public Subtask(String name, String description, String DataTime, Integer durationMin) {
