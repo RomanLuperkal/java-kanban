@@ -310,7 +310,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     public static void main(String[] args) {
-        File file = new File("save.csv");
+        File file = new File("resources" + File.separator + "save.csv");
         var fileBackedTasksManager1 = new FileBackedTasksManager(file);
         fileBackedTasksManager1.createSimpleTask(TestObjects.task);
         fileBackedTasksManager1.createEpicTask(TestObjects.epicTask1);
