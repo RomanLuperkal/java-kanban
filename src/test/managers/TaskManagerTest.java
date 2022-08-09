@@ -48,7 +48,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
             manager = (T) new InMemoryTaskManager();
         }
         if (type == FileBackedTasksManager.class) {
-            File file = new File("test_save.csv");
+            File file = new File("resources" + File.separator + "test_save.csv");
             manager = (T) new FileBackedTasksManager(file);
         }
 
