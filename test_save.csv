@@ -1,8 +1,0 @@
-id,type,name,status,description,epic,startTime,duration
-0,TASK,Test task1,NEW,Test task1 desc,01.01.2023 12:00,60
-1,EPIC,Test epic1,NEW,Test epic1 desc,01.01.2023 14:00,120
-2,SUBTASK,Test sub1,NEW,Test sub1 desc,1,01.01.2023 14:00,60
-3,SUBTASK,Test sub2,NEW,Test sub2 desc,1,01.01.2023 15:00,60
-4,SUBTASK,Test sub3,NEW,Test sub3 desc,1,null,null
-
-
