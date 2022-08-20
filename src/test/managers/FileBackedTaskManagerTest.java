@@ -54,7 +54,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
                 + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyList.csv").getAbsolutePath();
         ManagerLoadException e = assertThrows(ManagerLoadException.class, () -> FileBackedTasksManager
-                .loadFromFile(new File(pathManagerSaveFile)));
+                .loadManager(new File(pathManagerSaveFile)));
         assertNotNull(e.getMessage(), "Отсутствует сообщение об ошибке");
         assertFalse(e.getMessage().isBlank(), "Сообщение об ошибке пустое");
     }
@@ -96,7 +96,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
                 + "test-resources" + File.separator + "TestSaves" + File.separator
                 + "WithTasksList.csv").getAbsolutePath();
-        FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
+        FileBackedTasksManager manager = FileBackedTasksManager.loadManager(new File(pathManagerSaveFile));
         assertNotNull(manager, "Менеджер задач не был загружен");
         task1.setId(0);
         epic1.setId(1);
@@ -143,7 +143,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     public void testRecoveryEmptyEpicFromFile() {
         String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
                 + "test-resources" + File.separator + "TestSaves" + File.separator + "EmptyEpic.csv").getAbsolutePath();
-        FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
+        FileBackedTasksManager manager = FileBackedTasksManager.loadManager(new File(pathManagerSaveFile));
         epic1.setId(0);
         List<Task> existEpicsList = new ArrayList<>(List.of(epic1));
         List<Task> existHistory = new ArrayList<>(List.of(epic1));
@@ -185,7 +185,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         String pathManagerSaveFile = new File("src" + File.separator + "test" + File.separator
                 + "test-resources" + File.separator + "TestSaves" + File.separator
                 + "EmptyHistory.csv").getAbsolutePath();
-        FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File(pathManagerSaveFile));
+        FileBackedTasksManager manager = FileBackedTasksManager.loadManager(new File(pathManagerSaveFile));
         task1.setId(0);
         epic1.setId(1);
         List<Task> existListEpics = new ArrayList<>(List.of(epic1));

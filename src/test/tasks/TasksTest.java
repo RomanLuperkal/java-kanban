@@ -102,14 +102,13 @@ public class TasksTest {
 
         SimpleTask task2 = new SimpleTask("Test task1", "Test task1 desc");
         assertNull(task2.getEndTime());
-
     }
 
     @Test
     public void testEpicTaskGetEndTime() {
         LocalDateTime sub1DateTime = LocalDateTime.parse(LocalDateTime.now().plusMinutes(10).format(formatter)
                 , formatter);
-        LocalDateTime sub2DateTime = LocalDateTime.parse(LocalDateTime.now().plusMinutes(20).format(formatter)
+        LocalDateTime sub2DateTime = LocalDateTime.parse(LocalDateTime.now().plusHours(2).format(formatter)
                 , formatter);
         Subtask sub1 = new Subtask("Test sub1", "Test sub1 desc", sub1DateTime.format(formatter)
                 , 60);
