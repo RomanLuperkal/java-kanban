@@ -4,19 +4,21 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class Epic extends Task {
+public class Epic extends Task implements Cloneable {
 
     Map<Integer, Subtask> subtasks;
 
     public Epic(String name, String description) {
         super(name, description);
         subtasks = new HashMap<>();
+        type = TaskType.EPIC.toString();
     }
 
     public Epic(Integer id, String name, Status status, String description) {
         super(name, status, description);
         subtasks = new HashMap<>();
         this.id = id;
+        type = TaskType.EPIC.toString();
     }
 
     public void checkSubtasksStatus() {
@@ -60,6 +62,13 @@ public class Epic extends Task {
             return startTime.plus(duration);
         }
         return null;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        Object obj = super.clone();
+        Epic epic = (Epic) obj;
+        epic.setSubtasks(new HashMap<>());
+        return epic;
     }
 
     @Override
@@ -108,5 +117,9 @@ public class Epic extends Task {
                 .max(comparator);
         duration.ifPresent(subtask -> this.duration = Duration.between(this.startTime
                 , subtask.getEndTime()));
+    }
+
+    private void setSubtasks(Map<Integer, Subtask> subtasks) {
+        this.subtasks = subtasks;
     }
 }

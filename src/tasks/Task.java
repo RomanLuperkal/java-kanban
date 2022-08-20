@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public abstract class Task implements Comparable<Task> {
+    protected String type = "Task";
     protected String name;
     protected String description;
     protected Status status;
@@ -46,6 +47,10 @@ public abstract class Task implements Comparable<Task> {
         return this.startTime;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
     @Override
     public int compareTo(Task task) {
         LocalDateTime thisDate = this.getStartTime();
@@ -69,7 +74,7 @@ public abstract class Task implements Comparable<Task> {
         Task task = (Task) o;
 
         return name.equals(task.name) && description.equals(task.description) && status == task.status
-                && id.equals(task.id) && Objects.deepEquals(startTime, task.startTime)
+                && Objects.deepEquals(id, task.id) && Objects.deepEquals(startTime, task.startTime)
                 && Objects.deepEquals(duration, task.duration);
     }
 

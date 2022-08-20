@@ -19,6 +19,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         this.save = file;
     }
 
+    public FileBackedTasksManager(String url) {
+        save = null;
+    }
+
 
     @Override
     public void deleteSimpleTasks() {
@@ -114,7 +118,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
 
-    public static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadManager(File file) {
         List<String> content;
         try (Stream<String> lines = Files.lines(Path.of(file.getAbsolutePath()))) {
             content = lines.skip(1).collect(Collectors.toCollection(ArrayList::new));
@@ -132,27 +136,27 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             tasks.putAll(FileBackedTasksManager.taskFromString(content.get(i)));
         }
         for (Task task : tasks.values()) {
-            fileBackedTasksManager.loadTaskFromFile(task);
+            fileBackedTasksManager.restoringTasks(task);
         }
         List<Integer> historyData = FileBackedTasksManager.historyFromString(content.get(content.size() - 1));
         if (historyData != null) {
             for (Integer id : historyData) {
                 try {
-                    fileBackedTasksManager.loadTaskHistoryFromFile(id);
+                    fileBackedTasksManager.loadTaskHistory(id);
                     continue;
                 } catch (IllegalStateException e) {
                     //Обработка исключения не нужна т.к. нужно просто пропустить метод
                     // если задача с этим id не является Task
                 }
                 try {
-                    fileBackedTasksManager.loadEpicHistoryFromFile(id);
+                    fileBackedTasksManager.loadEpicHistory(id);
                     continue;
                 } catch (IllegalStateException e) {
                     //Обработка исключения не нужна т.к. нужно просто пропустить метод
                     // если задача с этим id не является Epic
                 }
                 try {
-                    fileBackedTasksManager.loadSubtaskHistoryFromFile(id);
+                    fileBackedTasksManager.loadSubtaskHistory(id);
                 } catch (IllegalStateException e) {
                     System.out.println("Ошибка восстановления истории! Задачи с таким id=" + id + " не существует.");
                 }
@@ -164,7 +168,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return fileBackedTasksManager;
     }
 
-    private void save() {
+    protected void save() {
         StringBuilder sb = new StringBuilder("id,type,name,status,description,epic,startTime,duration\n");
         try {
             for (Task task : super.getSimpleTasks()) {
@@ -189,7 +193,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         } catch (IllegalStateException e) {
             //Обработка исключения не нужна т.к. нужно просто пропустить цикл по причине отсутсвия сабок
         }
-        // taskToString(sb);
         sb.append("\n");
         try {
             sb.append(historyToString(super.getHistoryManager()));
@@ -241,7 +244,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                         , data[6], Integer.parseInt(data[7]), Integer.parseInt(data[5])));
             }
         }
-
         return tasks;
     }
 
@@ -254,7 +256,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
 
-    private void loadTaskFromFile(Task task) {
+    protected void restoringTasks(Task task) {
         if (task instanceof Subtask) {
             Subtask subtask = (Subtask) task;
             Epic epic = epics.get(subtask.getEpicID());
@@ -274,15 +276,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
-    private void loadTaskHistoryFromFile(Integer id) {
+    protected void loadTaskHistory(Integer id) {
         super.getSimpleTask(id);
     }
 
-    private void loadEpicHistoryFromFile(Integer id) {
+    protected void loadEpicHistory(Integer id) {
         super.getEpicTask(id);
     }
 
-    private void loadSubtaskHistoryFromFile(Integer id) {
+    protected void loadSubtaskHistory(Integer id) {
         super.getSubtask(id);
     }
 
@@ -322,7 +324,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return true;
     }
 
-    private void recoverIdManager(Integer id) {
+    protected void recoverIdManager(Integer id) {
         this.taskId = id;
     }
 
@@ -342,13 +344,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileBackedTasksManager1.getSubtask(TestObjects.subtask3ForEpicTask1.getId());
         fileBackedTasksManager1.getSubtask(TestObjects.subtask2ForEpicTask1.getId());
 
-        var fileBackedTasksManager2 = FileBackedTasksManager.loadFromFile(file);
+        var fileBackedTasksManager2 = FileBackedTasksManager.loadManager(file);
         System.out.println(fileBackedTasksManager2.getPrioritizedTasks());
         System.out.println("e");
         for (Task task : fileBackedTasksManager2.getHistory()) {
             System.out.println(task);
         }
-
-
     }
 }

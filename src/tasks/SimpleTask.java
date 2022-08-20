@@ -11,11 +11,13 @@ public class SimpleTask extends Task {
 
     public SimpleTask(String name, String description) {
         super(name, description);
+        type = TaskType.TASK.toString();
     }
 
     public SimpleTask(Integer id, String name, Status status, String description) {
         super(name, status, description);
         this.id = id;
+        type = TaskType.TASK.toString();
     }
 
     public SimpleTask(Integer id, String name, Status status, String description, String dataTime, Integer durationMin) {
@@ -23,12 +25,13 @@ public class SimpleTask extends Task {
         this.startTime = LocalDateTime.parse(dataTime, formatter);
         this.duration = Duration.ofMinutes(durationMin);
         this.id = id;
+        type = TaskType.TASK.toString();
     }
 
-    public SimpleTask(String name, String description, String DataTime, Integer durationMin) {
+    public SimpleTask(String name, String description, String dataTime, Integer durationMin) {
         super(name, description);
         LocalDateTime timeNow = LocalDateTime.now();
-        LocalDateTime DateTask = LocalDateTime.parse(DataTime, formatter);
+        LocalDateTime DateTask = LocalDateTime.parse(dataTime, formatter);
         if (timeNow.isAfter(DateTask)) {
             throw new TaskDateDurationException("Время начала не может быть раньше нынешнего момента времени");
         }
@@ -38,6 +41,7 @@ public class SimpleTask extends Task {
         this.startTime = DateTask;
         this.duration = Duration.ofMinutes(durationMin);
         this.status = Status.NEW;
+        type = TaskType.TASK.toString();
     }
 
     public LocalDateTime getEndTime() {
@@ -45,6 +49,10 @@ public class SimpleTask extends Task {
             return startTime.plus(duration);
         }
         return null;
+    }
+
+    public Duration getDuration() {
+        return this.duration;
     }
 
 

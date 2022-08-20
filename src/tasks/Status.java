@@ -13,6 +13,6 @@ public enum Status {
             case "NEW":
                 return Status.NEW;
         }
-        return null;
+        throw new IllegalStateException("Неккоректный статус");
     }
 }

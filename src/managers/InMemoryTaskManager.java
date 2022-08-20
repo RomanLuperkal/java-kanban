@@ -60,7 +60,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Map.Entry<Integer, SimpleTask> entry : tasks.entrySet()) {
             history.remove(entry.getKey());
             sortedTasks.remove(entry.getValue());
-            validator.deleteTaskDateTime((entry.getValue()).getStartTime());
+            validator.deleteTaskDateTime(entry.getValue());
         }
         tasks.clear();
     }
@@ -90,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
                 history.remove(entry.getKey());
                 sortedTasks.remove(entry.getValue());
-                validator.deleteTaskDateTime((entry.getValue()).getStartTime());
+                validator.deleteTaskDateTime(entry.getValue());
             }
             epic.deleteSubtasks();
         }
@@ -141,6 +141,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(task.getId())) {
             throw new IllegalStateException("Ошибка создания простой задачи! Такая задача уже есть.");
         }
+        if (task.getStartTime() != null && LocalDateTime.now().isAfter(task.getStartTime())) {
+            throw new IllegalStateException("Время начала не может быть раньше нынешнего момента времени");
+        }
         if (validator.validation(task)) {
             throw new TaskDateDurationException("Время начала задач не может пересекаться");
         }
@@ -169,6 +172,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalStateException("Ошибка создания подзадачи! Такая задача в эпике с id="
                     + epicTaskId + " уже есть.");
         }
+        if (subtask.getStartTime() != null && LocalDateTime.now().isAfter(subtask.getStartTime())) {
+            throw new IllegalStateException("Время начала не может быть раньше нынешнего момента времени");
+        }
         if (validator.validation(subtask)) {
             throw new TaskDateDurationException("Время начала подзадач не может пересекаться");
         }
@@ -183,6 +189,14 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(task.getId())) {
             throw new IllegalStateException("Ошибка обновления задачи! Такой задачи нет.");
         }
+        if (task.getStartTime() != null && LocalDateTime.now().isAfter(task.getStartTime())) {
+            throw new IllegalStateException("Время начала не может быть раньше нынешнего момента времени");
+        }
+        if (validator.validationUpdate(task, tasks.get(task.getId()))) {
+            throw new TaskDateDurationException("Время начала задач не может пересекаться");
+        }
+        sortedTasks.remove(tasks.get(task.getId()));
+        sortedTasks.add(task);
         tasks.put(task.getId(), task);
     }
 
@@ -192,6 +206,14 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             subtasks = epic.getMapSubtasks();
             if (subtasks.containsKey(subtask.getId())) {
+                if (subtask.getStartTime() != null && LocalDateTime.now().isAfter(subtask.getStartTime())) {
+                    throw new IllegalStateException("Время начала не может быть раньше нынешнего момента времени");
+                }
+                if (validator.validationUpdate(subtask, subtasks.get(subtask.getId()))) {
+                    throw new TaskDateDurationException("Время начала задач не может пересекаться");
+                }
+                sortedTasks.remove(subtasks.get(subtask.getId()));
+                sortedTasks.add(subtask);
                 subtasks.put(subtask.getId(), subtask);
                 epic.checkSubtasksStatus();
                 return;
@@ -215,9 +237,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(id)) {
             throw new IllegalStateException("Ошибка удаления задачи! Такой задачи нет");
         }
-        LocalDateTime taskDatetime = getSimpleTask(id).getStartTime();
-        validator.deleteTaskDateTime(taskDatetime);
-        sortedTasks.remove(getSimpleTask(id));
+        validator.deleteTaskDateTime(tasks.get(id));
+        sortedTasks.remove(tasks.get(id));
         history.remove(id);
         tasks.remove(id);
     }
@@ -231,8 +252,6 @@ public class InMemoryTaskManager implements TaskManager {
         for (Subtask sub : subtasks) {
             history.remove(sub.getId());
         }
-        LocalDateTime taskDatetime = getEpicTask(id).getStartTime();
-        validator.deleteTaskDateTime(taskDatetime);
         history.remove(id);
         epics.remove(id);
     }
@@ -243,9 +262,8 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epics.values()) {
             subtasks = epic.getMapSubtasks();
             if (subtasks.containsKey(id)) {
-                LocalDateTime taskDatetime = getSubtask(id).getStartTime();
-                validator.deleteTaskDateTime(taskDatetime);
-                sortedTasks.remove(getSubtask(id));
+                validator.deleteTaskDateTime(subtasks.get(id));
+                sortedTasks.remove(subtasks.get(id));
                 history.remove(id);
                 subtasks.remove(id);
                 epic.checkSubtasksStatus();
@@ -270,13 +288,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(sortedTasks);
+        if (!sortedTasks.isEmpty()) {
+            return new ArrayList<>(sortedTasks);
+        }
+        throw new IllegalStateException("Список отсортированых задач и подзадач пуст");
     }
 
     private int getTaskId() {
         return taskId++;
     }
-
 
     protected HistoryManager getHistoryManager() {
         return history;

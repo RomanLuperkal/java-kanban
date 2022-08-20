@@ -12,12 +12,14 @@ public class Subtask extends Task {
 
     public Subtask(String name, String description) {
         super(name, description);
+        type = TaskType.SUBTASK.toString();
     }
 
     public Subtask(Integer id, String name, Status status, String description, Integer epicID) {
         super(name, status, description);
         this.epicID = epicID;
         this.id = id;
+        type = TaskType.SUBTASK.toString();
     }
 
     public Subtask(Integer id, String name, Status status, String description, String DataTime, Integer durationMin, Integer epicID) {
@@ -26,6 +28,7 @@ public class Subtask extends Task {
         this.duration = Duration.ofMinutes(durationMin);
         this.epicID = epicID;
         this.id = id;
+        type = TaskType.SUBTASK.toString();
     }
 
     public Subtask(String name, String description, String DataTime, Integer durationMin) {
@@ -41,6 +44,7 @@ public class Subtask extends Task {
         this.startTime = DateTask;
         this.duration = Duration.ofMinutes(durationMin);
         this.status = Status.NEW;
+        type = TaskType.SUBTASK.toString();
     }
 
     public LocalDateTime getEndTime() {
@@ -65,7 +69,7 @@ public class Subtask extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Subtask subtask = (Subtask) o;
-        return epicID.equals(subtask.epicID);
+        return Objects.deepEquals(epicID, subtask.epicID);
     }
 
     @Override
