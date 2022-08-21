@@ -42,7 +42,7 @@ public class KVTaskClient {
 
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, handler);
+        client.send(request, handler);
     }
 
     private String getAPI_TOKEN() throws InterruptedException, IOException {

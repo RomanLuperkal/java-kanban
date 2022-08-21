@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class HTTPTaskManager extends FileBackedTasksManager implements TaskManager {
+public class HTTPTaskManager extends FileBackedTasksManager {
     private final KVTaskClient kvTaskClient;
     private final static Gson gson;
 
@@ -108,6 +108,8 @@ public class HTTPTaskManager extends FileBackedTasksManager implements TaskManag
                 }.getType());
             }
         } catch (JsonSyntaxException e) {
+            /*Обработка исключения не нужна т.к. нужно просто пропустить этот блок
+            по причине того, что история пуста*/
         }
 
 

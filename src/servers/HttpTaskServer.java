@@ -28,7 +28,6 @@ public class HttpTaskServer {
 
     public HttpTaskServer(TaskManager manager) throws IOException {
         server = HttpServer.create();
-        File file = new File("resources" + File.separator + "serverSaves.csv");
         this.manager = manager;
         server.bind(new InetSocketAddress(PORT), 0);
         server.createContext("/tasks/simpleTask", this::simpleTaskEndpoints);

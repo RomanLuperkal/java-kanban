@@ -281,25 +281,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void testUpdateSubtasks() {
         manager.createEpicTask(epic1);
         manager.createSubtask(epic1.getId(), subtask1);
-        //manager.createSubtask(epic1.getId(), subtask2);
-        //subtask1.changeStatus(Status.IN_PROGRESS);
         subtask2.setId(1);
         subtask2.changeStatus(Status.IN_PROGRESS);
         manager.updateSubtask(subtask2);
         Epic updateEpic = manager.getEpicTask(epic1.getId());
-        Subtask updateSub1 = manager.getSubtask(1);
         assertEquals(subtask2, manager.getSubtask(1), "Задачи не совпадают");
         assertEquals(Status.IN_PROGRESS, updateEpic.getStatus(), "Статусы задач не совпадают");
-
-       /* subtask2.changeStatus(Status.DONE);
-        manager.updateSubtask(subtask2);
-        Subtask updateSub2 = manager.getSubtask(subtask2.getId());
-        assertEquals(Status.DONE, updateSub2.getStatus(), "Статусы задач не совпадают");
-        assertEquals(Status.IN_PROGRESS, updateEpic.getStatus(), "Статусы задач не совпадают");
-
-        subtask1.changeStatus(Status.DONE);
-        manager.updateSubtask(subtask1);
-        assertEquals(Status.DONE, updateEpic.getStatus(), "Статусы задач не совпадают");*/
     }
 
     @Test

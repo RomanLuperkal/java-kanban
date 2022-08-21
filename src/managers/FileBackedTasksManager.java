@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager, TestObjects {
+public class FileBackedTasksManager extends InMemoryTaskManager implements TestObjects {
     private final File save;
 
     public FileBackedTasksManager(File file) {
